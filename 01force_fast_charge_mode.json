@@ -1,0 +1,1 @@
+{"control":{"id":"seekbar","min":"0","progress":"#!\/system\/bin\/sh\n\ncat \/sys\/kernel\/fast_charge\/force_fast_charge","apply":"#!\/system\/bin\/sh\n\nprogress=$1\n\necho $progress > \/sys\/kernel\/fast_charge\/force_fast_charge","title":"Force Fast Charge mode","max":"2","description":"Disabled\nForce AC\nCustom mA"},"version":1}

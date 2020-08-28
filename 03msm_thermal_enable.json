@@ -1,0 +1,1 @@
+{"control":{"enable":"#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/msm_thermal\/parameters\/enable_main) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi","id":"switch","apply":"#!\/system\/bin\/sh\n\nstatus=$1\n\necho $status > \/sys\/module\/msm_thermal\/parameters\/enable_main","title":"Temperature Throttle","description":"SoC temperature limit toggle."},"version":1}
