@@ -1,0 +1,1 @@
+{"control":{"id":"switch","apply":"#!\/system\/bin\/sh\nsetenforce $1","title":"SELinux","description":"Security-Enhanced Linux is a Linux kernel security module that provides a mechanism for supporting access control security policies.","enable":"#\/system\/bin\/sh\nif [ `getenforce` == \"Enforcing\" ]; then\necho 1\nelse\necho 0\nfi"},"version":1}
