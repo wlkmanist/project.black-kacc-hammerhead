@@ -1,0 +1,1 @@
+{"control":{"progress":"#!\/system\/bin\/sh\n\na=$(cat \/proc\/sys\/kernel\/printk)\nb=$(expr substr \"${a}\" 1 1)\necho $b","min":"0","id":"seekbar","apply":"#!\/system\/bin\/sh\n\nprogress=$1\n\necho $progress > \/proc\/sys\/kernel\/printk","title":"Kernel Log Level","max":"8","description":"Changing the default console log level."},"version":1}
