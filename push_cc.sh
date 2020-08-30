@@ -1,2 +1,2 @@
-adb push ./controls /storage/emulated/0/Android/data/com.grarak.kerneladiutor/
+adb push ./controls /sdcard/Android/data/com.grarak.kerneladiutor/
 
