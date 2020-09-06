@@ -1,0 +1,1 @@
+{"control":{"id":"generic","value":"#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/fcc_mah","apply":"#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/fcc_mah","title":"Battery Designed Capacity","description":"Set full charge battery capacity mah. Changing this value will not affect on real capacity."},"version":1}

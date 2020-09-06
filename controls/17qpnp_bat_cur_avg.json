@@ -1,1 +1,12 @@
-{"control":{"progress":"#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/bat_current_avg","min":"0","id":"seekbar","apply":"#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/bat_current_avg","title":"Battery Avg Current Gauge Coefficient","max":"50","description":"This control is not so important. Value make impact on display label (read) of this sysfs control that provides info about actual battery current uA. Use external app like Cool Tool to see this info.\nKernel Adiutor only writes a data.\nHigh values will smooth output data. Set 0 to disable gauge."},"version":1}
+{
+    "control": {
+        "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/bat_current_avg",
+        "min": "0",
+        "id": "seekbar",
+        "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/bat_current_avg",
+        "title": "Battery Avg Current Gauge Coefficient",
+        "max": "50",
+        "description": "This control is not so important. Value make impact on display label (read) of this sysfs control that provides info about actual battery current uA. Use external app like Cool Tool to see this info.\nKernel Adiutor only writes a data.\nHigh values will smooth output data. Set 0 to get raw data."
+    },
+    "version": 1
+}
