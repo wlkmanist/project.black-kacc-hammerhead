@@ -1,3 +1,7 @@
 Kernel Adiutor Custom Controls
 for project.black kernel (1.0.11+)
 by wlkmanist
+
+Warning: make sure you disabled "apply on boot"
+for all custom controls after install
+(if you installing controls.json)
