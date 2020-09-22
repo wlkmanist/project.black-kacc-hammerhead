@@ -27,7 +27,7 @@
             "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\nvalue=$1\n\necho $value > \/sys\/kernel\/fast_charge\/fast_charge_level",
             "title": "Fast Charge custom current limit",
-            "arguments": "900",
+            "arguments": "1200",
             "description": "Limit max charge current mA\nWorks if Force Fast Charge in custom mode\n[500 900 1200 1500 1800 2000]",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/kernel\/fast_charge\/fast_charge_level",
             "uniqueId": 285
@@ -49,7 +49,7 @@
             "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+20\"\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/temp_threshold",
             "title": "Temperature Limit",
-            "arguments": "65",
+            "arguments": "67",
             "max": "110",
             "description": "If the temperature goes above, the thermal will throttle the CPU frequency to lower the temperature.",
             "uniqueId": 2354
@@ -71,7 +71,7 @@
             "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+95\"\n\nchmod \"644\" \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit\n\nchmod \"444\" \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit",
             "title": "Critical Temperature Threshold",
-            "arguments": "15",
+            "arguments": "10",
             "max": "125",
             "description": "If the temperature goes above, the thermal will synchronize filesystem and power off. This threshold needs to avoid permanent hardware damage if throttling disabled or it works ineffective by any case.",
             "uniqueId": 3075
@@ -196,33 +196,77 @@
             "uniqueId": 9777
         },
         {
-            "value": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/fcc_mah",
             "id": "generic",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/fcc_mah",
+            "onboot": true,
             "title": "Battery Designed Capacity",
+            "arguments": "1700",
             "description": "Set full charge battery capacity mah. Changing this value will not affect on real capacity.",
+            "value": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/fcc_mah",
             "uniqueId": 9149
         },
         {
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/bat_current_avg",
             "min": "0",
             "id": "seekbar",
-            "onboot": true,
+            "onboot": false,
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/bat_current_avg",
             "title": "Battery Avg Current Gauge Coefficient",
-            "arguments": "4",
+            "arguments": "0",
             "max": "50",
             "description": "This control is not so important. Value make impact on display label (read) of this sysfs control that provides info about actual battery current uA. Use external app like Cool Tool to see this info.\nKernel Adiutor only writes a data.\nHigh values will smooth output data. Set 0 to get raw data."
         },
         {
-            "id": "generic",
+            "id": "seekbar",
+            "min": "0",
+            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/bat_power_avg",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/bat_power_avg",
             "onboot": true,
+            "title": "Battery Avg Power Gauge Coefficient",
+            "arguments": "5",
+            "max": "50",
+            "description": "Another sysfs display label control. Changes avg coefficient of actual battery power uW. Use external app like Cool Tool to see this info.\nKernel Adiutor only writes a data.\nHigh values will smooth output data. Set 0 to get raw data.",
+            "uniqueId": 9286
+        },
+        {
+            "id": "switch",
+            "onboot": true,
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/low_batt_disable_dyn_fsync",
+            "title": "Disable Dynamic Fsync If Low Battery",
+            "arguments": "1",
+            "description": "When battery level less than 5% fsync operations is synchronous. Disabling this may cause data loss in case of system crash by too low battery voltage. If disabled critical level battery shutdown or cpu at max load with max display brightness battery voltage can drop below normal values. ",
+            "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/max17048_battery\/parameters\/low_batt_disable_dyn_fsync) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
+            "uniqueId": 3362
+        },
+        {
+            "id": "generic",
+            "onboot": false,
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/sync_threshold_min",
             "title": "CPU Boost: Min Sync Threshold",
-            "arguments": "450000",
+            "arguments": "0",
             "description": "Minimal source CPU frequency to be boosted destination cpu. If frequency lower than this value destination cpu will not boost.\nValue in KHz. Set 0 to disable.",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/cpu_boost\/parameters\/sync_threshold_min",
             "uniqueId": 6209
+        },
+        {
+            "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/cpu_boost\/parameters\/load_based_syncs ) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
+            "id": "switch",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/load_based_syncs",
+            "title": "CPU Boost: Load Based Syncs",
+            "arguments": "1",
+            "description": "Determine whether the module should react to all task migration events or only to those which maintain task load at least that specified by \"Migration Load Threshold\".\nThis switch also changes the way CPU frequencies are going to be changed: when it is disabled, frequencies of source and destination cpus are simply synchronized to a source's one; in case this is enabled, the frequency is changed to either the load fraction of current policy maximum or source's frequency, choosing the biggest of two.",
+            "uniqueId": 7888
+        },
+        {
+            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/cpu_boost\/parameters\/migration_load_threshold",
+            "min": "0",
+            "id": "seekbar",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/migration_load_threshold",
+            "title": "CPU Boost: Migration Load Threshold",
+            "max": "100",
+            "arguments": "30",
+            "description": "Minimum task load (in precentage) that is considered as noticeable. If a task load is less than this value, frequency synchronization will not occur.\nNote that this threshold is used only if \"Load Based Syncs\" is enabled.",
+            "uniqueId": 5057
         }
     ],
     "version": 1
