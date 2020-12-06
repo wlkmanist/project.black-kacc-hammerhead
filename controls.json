@@ -49,7 +49,7 @@
             "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+20\"\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/temp_threshold",
             "title": "Temperature Limit",
-            "arguments": "67",
+            "arguments": "70",
             "max": "110",
             "description": "If the temperature goes above, the thermal will throttle the CPU frequency to lower the temperature.",
             "uniqueId": 2354
@@ -60,7 +60,7 @@
             "apply": "#!\/system\/bin\/sh\n\nchmod \"644\" \/sys\/module\/msm_thermal\/parameters\/enable_extreme\n\nif [ $1 -eq 0 ]\nthen\n  echo 1 > \/sys\/module\/msm_thermal\/parameters\/enable_extreme\nelse\n  echo 0 > \/sys\/module\/msm_thermal\/parameters\/enable_extreme\nfi\n\nchmod \"444\" \/sys\/module\/msm_thermal\/parameters\/enable_extreme",
             "title": "Thermal Shutdown",
             "arguments": "1",
-            "description": "Critical shutdown by SoC temperature threshold.",
+            "description": "Critical shutdown by SoC temperature threshold.\nDisable this only if you using extreme cooling and CPU temp is below zero.",
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/msm_thermal\/parameters\/enable_extreme) = Y ]\nthen\n  echo 0\nelse \n  echo 1\nfi",
             "uniqueId": 4524
         },
@@ -84,7 +84,7 @@
             "title": "Thermal Driver Polling Frequency",
             "arguments": "5",
             "max": "7",
-            "description": "High values provides more stable thermals while throttling. Low values have lower CPU impact. This value is used only if current SOC temperature up to 15°C below throttling threshold temp. On low temp used: 4CpS.\n[0   4   5   8   10   20   25   40]\nCycles per Second (CpS).\nSelect 0 to choose default polling frequency.",
+            "description": "High values provides more stable thermals while throttling. Low values have lower CPU impact. This value is used only if current SOC temperature up to 15°C below throttling threshold temp. On low temp used: 4Hz.\n[Def   4   5   8   10   20   25   40]\nValues in Hz.\nSelect 0 to choose default polling frequency.",
             "uniqueId": 1204
         },
         {
@@ -96,7 +96,7 @@
             "title": "LCD Backlight Min Level",
             "arguments": "2",
             "max": "30",
-            "description": "The minimum available brightness value controlled by lm3630.",
+            "description": "The minimum available brightness value.",
             "uniqueId": 935
         },
         {
@@ -108,7 +108,7 @@
             "title": "LCD Backlight Max Level",
             "arguments": "128",
             "max": "255",
-            "description": "The maximum available brightness value controlled by lm3630.",
+            "description": "The maximum available brightness value.",
             "uniqueId": 1011
         },
         {
@@ -118,8 +118,8 @@
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+1\"\n\necho $a > \/sys\/class\/backlight\/lm3630\/device\/lm3630_level",
             "title": "LCD Backlight Current Level",
             "max": "255",
-            "arguments": "44",
-            "description": "Actual brightness value controlled by lm3630.",
+            "arguments": "117",
+            "description": "Actual screen brightness value.",
             "uniqueId": 8815
         },
         {
@@ -127,8 +127,9 @@
             "min": "0",
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/proc\/sys\/kernel\/printk)\nb=$(expr substr \"${a}\" 1 1)\necho $b",
             "apply": "#!\/system\/bin\/sh\n\nprogress=$1\n\necho $progress > \/proc\/sys\/kernel\/printk",
+            "onboot": true,
             "title": "Kernel Log Level",
-            "arguments": "8",
+            "arguments": "6",
             "max": "8",
             "description": "Changing the default console log level.",
             "uniqueId": 1133
@@ -174,15 +175,16 @@
             "onboot": true,
             "title": "Battery Shutdown",
             "arguments": "0",
-            "description": "Disabling this will remove shutdown by critical low battery level trigger for android system. System will power off by kernel at 3.0V to prevent hardware and filesystem damage. But there is a risk of data loss."
+            "description": "Disabling this will remove shutdown trigger if battery level is low. However, kernel will power off device at 3.0V to prevent hardware and filesystem damage."
         },
         {
             "id": "switch",
-            "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/max17048_battery\/parameters\/force_default_temp) = N ]\nthen\n  echo 0\nelse \n  echo 1\nfi",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/force_default_temp",
-            "title": "Force Good Battery Temp",
+            "onboot": true,
+            "title": "Disable Battery Temp Control",
             "arguments": "1",
-            "description": "Spoofing of battery temperature. This is useful if your battery temp reads wrong, in example: swapped battery, damaged cable or used 2-wire connection. In this case controller reads -30°C and can not charge battery because of Cold state. Wait a minute to apply value.",
+            "description": "Spoofing of battery temperature and disabling state notification. This is useful if your battery temp reads wrong, in example: swapped battery, damaged cable or used 2-wire connection. In this case controller reads -30°C and battery can not be charged because of Cold health state.\nWarning: if this enabled thermal and overvoltage control will be disabled!.\nReplug your charger to apply.",
+            "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/max17048_battery\/parameters\/force_default_temp) = N ]\nthen\n  echo 0\nelse \n  echo 1\nfi",
             "uniqueId": 2202
         },
         {
@@ -190,7 +192,7 @@
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = (a \/ 16 + ((a % 16) > 0)) * 16\"\n\nif [ $a -lt 3504 ]; then\n  echo 3504 > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv\n  exit\nfi\n\nif [ $a -gt 4400 ]; then\n  echo 4400 > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv\n  exit\nfi\n\necho $a > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv",
             "onboot": true,
             "title": "Battery Max Designed Voltage",
-            "arguments": "4300",
+            "arguments": "4400",
             "description": "This value should depend on max designed voltage of installed battery. Bad value may cause degradation, fire and explosion of the battery. So set voltage properly.\nReplug you charger after changing this.\n[Li-ion: 4200mV. Li-poly: 4350-4400mV].\n[Nexus 5 BL-T9: 4350mV].",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv",
             "uniqueId": 9777
@@ -200,13 +202,21 @@
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/fcc_mah",
             "onboot": true,
             "title": "Battery Designed Capacity",
-            "arguments": "1700",
+            "arguments": "2750",
             "description": "Set full charge battery capacity mah. Changing this value will not affect on real capacity.",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/fcc_mah",
             "uniqueId": 9149
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/bat_current_avg",
+            "value": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/max17048_battery\/parameters\/batt_soc_coeff",
+            "id": "generic",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/batt_soc_coeff",
+            "title": "Battery Precentage Coefficient",
+            "description": "Fine tune for battery capacity level displayed by the system. Adjust this value at full charge. Wait to update current battery level.\nStock: 19531.",
+            "uniqueId": 7762
+        },
+        {
+            "progress": "#!\/system\/bin\/sh\n\necho -1",
             "min": "0",
             "id": "seekbar",
             "onboot": false,
@@ -219,7 +229,7 @@
         {
             "id": "seekbar",
             "min": "0",
-            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/bat_power_avg",
+            "progress": "#!\/system\/bin\/sh\n\necho -1",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/bat_power_avg",
             "onboot": true,
             "title": "Battery Avg Power Gauge Coefficient",
@@ -249,12 +259,13 @@
             "uniqueId": 6209
         },
         {
-            "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/cpu_boost\/parameters\/load_based_syncs ) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/load_based_syncs",
+            "onboot": true,
             "title": "CPU Boost: Load Based Syncs",
             "arguments": "1",
             "description": "Determine whether the module should react to all task migration events or only to those which maintain task load at least that specified by \"Migration Load Threshold\".\nThis switch also changes the way CPU frequencies are going to be changed: when it is disabled, frequencies of source and destination cpus are simply synchronized to a source's one; in case this is enabled, the frequency is changed to either the load fraction of current policy maximum or source's frequency, choosing the biggest of two.",
+            "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/cpu_boost\/parameters\/load_based_syncs ) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
             "uniqueId": 7888
         },
         {
@@ -262,9 +273,10 @@
             "min": "0",
             "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/migration_load_threshold",
+            "onboot": true,
             "title": "CPU Boost: Migration Load Threshold",
             "max": "100",
-            "arguments": "30",
+            "arguments": "25",
             "description": "Minimum task load (in precentage) that is considered as noticeable. If a task load is less than this value, frequency synchronization will not occur.\nNote that this threshold is used only if \"Load Based Syncs\" is enabled.",
             "uniqueId": 5057
         }
