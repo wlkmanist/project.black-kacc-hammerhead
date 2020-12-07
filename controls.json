@@ -192,7 +192,7 @@
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = (a \/ 16 + ((a % 16) > 0)) * 16\"\n\nif [ $a -lt 3504 ]; then\n  echo 3504 > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv\n  exit\nfi\n\nif [ $a -gt 4400 ]; then\n  echo 4400 > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv\n  exit\nfi\n\necho $a > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv",
             "onboot": true,
             "title": "Battery Max Designed Voltage",
-            "arguments": "4400",
+            "arguments": "4380",
             "description": "This value should depend on max designed voltage of installed battery. Bad value may cause degradation, fire and explosion of the battery. So set voltage properly.\nReplug you charger after changing this.\n[Li-ion: 4200mV. Li-poly: 4350-4400mV].\n[Nexus 5 BL-T9: 4350mV].",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv",
             "uniqueId": 9777
@@ -208,11 +208,13 @@
             "uniqueId": 9149
         },
         {
-            "value": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/max17048_battery\/parameters\/batt_soc_coeff",
             "id": "generic",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/batt_soc_coeff",
+            "onboot": true,
             "title": "Battery Precentage Coefficient",
+            "arguments": "30900",
             "description": "Fine tune for battery capacity level displayed by the system. Adjust this value at full charge. Wait to update current battery level.\nStock: 19531.",
+            "value": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/max17048_battery\/parameters\/batt_soc_coeff",
             "uniqueId": 7762
         },
         {
@@ -279,6 +281,16 @@
             "arguments": "25",
             "description": "Minimum task load (in precentage) that is considered as noticeable. If a task load is less than this value, frequency synchronization will not occur.\nNote that this threshold is used only if \"Load Based Syncs\" is enabled.",
             "uniqueId": 5057
+        },
+        {
+            "id": "switch",
+            "onboot": true,
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/disable_while_suspended",
+            "title": "CPU-Boost: Disable Boost When Suspended",
+            "arguments": "1",
+            "description": "Use state notifier helper to determine state and disable cpu-boost driver when device is suspended. This should help to minimize unnecessary spikes and reduce power consumption when screen is off.",
+            "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/cpu_boost\/parameters\/disable_while_suspended ) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
+            "uniqueId": 1325
         }
     ],
     "version": 1
