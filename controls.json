@@ -88,6 +88,14 @@
             "uniqueId": 1204
         },
         {
+            "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/lm3630_bl\/parameters\/lm3630_exp_control_enable) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
+            "id": "switch",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/lm3630_bl\/parameters\/lm3630_exp_control_enable",
+            "title": "Exponential LCD Backlight Level Control",
+            "description": "Use square function to make backlight brightness change non linear.",
+            "uniqueId": 4066
+        },
+        {
             "id": "seekbar",
             "min": "1",
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_min_level)\nb=$(expr substr \"${a}\" 30 3); let \"b=b-1\"\n\necho $b",
@@ -118,7 +126,7 @@
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+1\"\n\necho $a > \/sys\/class\/backlight\/lm3630\/device\/lm3630_level",
             "title": "LCD Backlight Current Level",
             "max": "255",
-            "arguments": "117",
+            "arguments": "57",
             "description": "Actual screen brightness value.",
             "uniqueId": 8815
         },
@@ -131,7 +139,7 @@
             "title": "Kernel Log Level",
             "arguments": "6",
             "max": "8",
-            "description": "Changing the default console log level.",
+            "description": "Change the default console log level.",
             "uniqueId": 1133
         },
         {
@@ -140,7 +148,7 @@
             "apply": "#!\/system\/bin\/sh\n\nstatus=$1\n\necho $status > \/sys\/class\/leds\/led:flash_torch\/is_torch",
             "title": "Torch 2-Step Logic",
             "arguments": "1",
-            "description": "Apply custom 2-step logic for torch LED. That allows to change 2 levels of brightness on kernel level. Compatible with CM torch apps (that have High Brightness mode).",
+            "description": "Apply custom 2-step logic for torch LED. That allows 2 levels of brightness to be changed on kernel level. Compatible with CM torch apps (that have High Brightness mode).",
             "enable": "#!\/system\/bin\/sh\n\necho $(cat \/sys\/class\/leds\/led:flash_torch\/is_torch)",
             "uniqueId": 3787
         },
@@ -153,7 +161,7 @@
             "title": "LED Default Brightness",
             "arguments": "1",
             "max": "20",
-            "description": "Changes torch default brightness value. Stock: 8. This value can not be higher than High Brightness mode value.",
+            "description": "Changes the default brightness of the flashlight. Stock: 8. This value can not be higher than High Brightness mode value.",
             "uniqueId": 5079
         },
         {
@@ -165,7 +173,7 @@
             "title": "LED High Brightness Mode",
             "arguments": "15",
             "max": "20",
-            "description": "Changes torch max brightness value. Stock: 12. Using torch at high values for long time may cause LED overheat.",
+            "description": "Changes the max brightness of the flashlight. Stock: 12. Using torch at high brightness for long time may cause LED overheat.",
             "uniqueId": 4818
         },
         {
@@ -212,7 +220,7 @@
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/batt_soc_coeff",
             "onboot": true,
             "title": "Battery Precentage Coefficient",
-            "arguments": "30900",
+            "arguments": "31100",
             "description": "Fine tune for battery capacity level displayed by the system. Adjust this value at full charge. Wait to update current battery level.\nStock: 19531.",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/max17048_battery\/parameters\/batt_soc_coeff",
             "uniqueId": 7762
@@ -284,12 +292,10 @@
         },
         {
             "id": "switch",
-            "onboot": true,
-            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/disable_while_suspended",
-            "title": "CPU-Boost: Disable Boost When Suspended",
-            "arguments": "1",
-            "description": "Use state notifier helper to determine state and disable cpu-boost driver when device is suspended. This should help to minimize unnecessary spikes and reduce power consumption when screen is off.",
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/cpu_boost\/parameters\/disable_while_suspended ) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/disable_while_suspended",
+            "title": "CPU Boost: Disable Boost When Suspended",
+            "description": "Use state notifier helper to determine state and disable cpu-boost driver when device is suspended. This should help to minimize unnecessary spikes and reduce power consumption when screen is off.",
             "uniqueId": 1325
         }
     ],
