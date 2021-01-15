@@ -241,29 +241,6 @@
             "uniqueId": 7762
         },
         {
-            "id": "seekbar",
-            "min": "0",
-            "progress": "#!\/system\/bin\/sh\n\necho -1",
-            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/bat_current_avg",
-            "onboot": false,
-            "title": "Battery Avg Current Gauge Coefficient",
-            "max": "50",
-            "arguments": "0",
-            "description": "This control is not so important. Value make impact on display label (read) of this sysfs control that provides info about actual battery current uA. Use external app like Cool Tool to see this info.\nKernel Adiutor only writes a data.\nHigh values will smooth output data. Set 0 to get raw data."
-        },
-        {
-            "progress": "#!\/system\/bin\/sh\n\necho -1",
-            "min": "0",
-            "id": "seekbar",
-            "onboot": true,
-            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/bat_power_avg",
-            "title": "Battery Avg Power Gauge Coefficient",
-            "max": "50",
-            "arguments": "5",
-            "description": "Another sysfs display label control. Changes avg coefficient of actual battery power uW. Use external app like Cool Tool to see this info.\nKernel Adiutor only writes a data.\nHigh values will smooth output data. Set 0 to get raw data.",
-            "uniqueId": 9286
-        },
-        {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/low_batt_disable_dyn_fsync",
             "onboot": true,
@@ -316,31 +293,45 @@
             "uniqueId": 1325
         },
         {
+            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/kgsl\/kgsl-3d0\/wake_nice); let \"a = -a\"\necho $a",
+            "min": "0",
+            "id": "seekbar",
+            "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = -a\"\necho $a > \/sys\/class\/kgsl\/kgsl-3d0\/wake_nice",
+            "title": "KGSL: Queue Priority",
+            "max": "20",
+            "description": "The GPU start sequence needs to run with low latency when coming out of slumber for the first draw command. This control changes priority of the start function workqueue.\nGreater value = higher priority.\nNot recomended to touch this.",
+            "uniqueId": 368
+        },
+        {
             "id": "seekbar",
             "min": "0",
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/warmup_ms",
-            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/warmup_ms",
+            "onboot": true,
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/warmup_ms\necho 5 > \/sys\/class\/timed_output\/vibrator\/enable",
             "title": "Vibrator Warmup Time",
+            "arguments": "5",
             "max": "60",
             "description": "PWM vibrator timing fine tune. Value in ms.",
             "uniqueId": 3194
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/driving_ms",
-            "min": "0",
             "id": "seekbar",
-            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/driving_ms",
+            "min": "0",
+            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/driving_ms",
+            "onboot": true,
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/driving_ms\necho 5 > \/sys\/class\/timed_output\/vibrator\/enable",
             "title": "Vibrator Driving Time",
+            "arguments": "35",
             "max": "60",
             "description": "PWM vibrator timing fine tune. Value in ms.",
             "uniqueId": 6324
         },
         {
-            "id": "seekbar",
-            "min": "0",
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/braking_ms",
+            "min": "0",
+            "id": "seekbar",
             "onboot": true,
-            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/braking_ms",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/braking_ms\necho 5 > \/sys\/class\/timed_output\/vibrator\/enable",
             "title": "Vibrator Braking Time",
             "arguments": "30",
             "max": "60",
@@ -357,16 +348,6 @@
             "arguments": "0",
             "description": "Select value to test your fine tune PWM vibrator settings. Value in ms.",
             "uniqueId": 9312
-        },
-        {
-            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/kgsl\/kgsl-3d0\/wake_nice); let \"a = -a\"\necho $a",
-            "min": "0",
-            "id": "seekbar",
-            "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = -a\"\necho $a > \/sys\/class\/kgsl\/kgsl-3d0\/wake_nice",
-            "title": "KGSL: Queue Priority",
-            "max": "20",
-            "description": "The GPU start sequence needs to run with low latency when coming out of slumber for the first draw command. This control changes priority of the start function workqueue.\nGreater value = higher priority.\nNot recomended to touch this.",
-            "uniqueId": 368
         }
     ],
     "version": 1
