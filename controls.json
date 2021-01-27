@@ -2,6 +2,7 @@
     "database": [
         {
             "id": "switch",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\nsetenforce $1",
             "title": "SELinux",
             "arguments": "1",
@@ -10,18 +11,20 @@
             "uniqueId": 7646
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/kernel\/fast_charge\/force_fast_charge",
-            "min": "0",
             "id": "seekbar",
+            "min": "0",
+            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/kernel\/fast_charge\/force_fast_charge",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\nprogress=$1\n\necho $progress > \/sys\/kernel\/fast_charge\/force_fast_charge",
             "title": "Force Fast Charge mode",
-            "arguments": "2",
             "max": "2",
+            "arguments": "2",
             "description": "Disabled\nForce AC\nCustom mA",
             "uniqueId": 6964
         },
         {
             "id": "generic",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\nvalue=$1\n\necho $value > \/sys\/kernel\/fast_charge\/fast_charge_level",
             "title": "Fast Charge custom current limit",
             "arguments": "1200",
@@ -31,6 +34,7 @@
         },
         {
             "id": "switch",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\nstatus=$1\n\necho $status > \/sys\/module\/msm_thermal\/parameters\/enable_main",
             "title": "Temperature Throttle",
             "arguments": "1",
@@ -39,18 +43,20 @@
             "uniqueId": 7827
         },
         {
-            "id": "seekbar",
-            "min": "20",
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/module\/msm_thermal\/parameters\/temp_threshold); let \"a=a-20\"\n\necho $a",
+            "min": "20",
+            "id": "seekbar",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+20\"\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/temp_threshold",
             "title": "Temperature Limit",
-            "max": "110",
             "arguments": "67",
+            "max": "110",
             "description": "If the temperature goes above, the thermal will throttle the CPU frequency to lower the temperature.",
             "uniqueId": 2354
         },
         {
             "id": "switch",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\nchmod \"644\" \/sys\/module\/msm_thermal\/parameters\/enable_extreme\n\nif [ $1 -eq 0 ]\nthen\n  echo 1 > \/sys\/module\/msm_thermal\/parameters\/enable_extreme\nelse\n  echo 0 > \/sys\/module\/msm_thermal\/parameters\/enable_extreme\nfi\n\nchmod \"444\" \/sys\/module\/msm_thermal\/parameters\/enable_extreme",
             "title": "Thermal Shutdown",
             "arguments": "1",
@@ -59,30 +65,33 @@
             "uniqueId": 4524
         },
         {
-            "id": "seekbar",
-            "min": "95",
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit); let \"a=a-95\"\n\necho $a",
+            "min": "95",
+            "id": "seekbar",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+95\"\n\nchmod \"644\" \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit\n\nchmod \"444\" \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit",
             "title": "Critical Temperature Threshold",
-            "max": "125",
             "arguments": "10",
+            "max": "125",
             "description": "If the temperature goes above, the thermal will synchronize filesystem and power off. This threshold needs to avoid permanent hardware damage if throttling disabled or it works ineffective by any case.",
             "uniqueId": 3075
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/msm_thermal\/parameters\/polling_freq_preset",
-            "min": "0",
             "id": "seekbar",
+            "min": "0",
+            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/msm_thermal\/parameters\/polling_freq_preset",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/msm_thermal\/parameters\/polling_freq_preset",
+            "onboot": true,
             "title": "Thermal Driver Polling Frequency",
-            "max": "7",
             "arguments": "6",
+            "max": "7",
             "description": "High values provides more stable thermals while throttling. Low values have lower CPU impact. This value is used only if current SOC temperature up to 15°C below throttling threshold temp. On low temp used: 4Hz.\n[Def   4   5   8   10   20   25   40]\nValues in Hz.\nSelect 0 to choose default polling frequency.",
             "uniqueId": 1204
         },
         {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/backlight\/lm3630\/device\/lm3630_exp_control",
+            "onboot": true,
             "title": "Exponential LCD Backlight Level Control",
             "arguments": "1",
             "description": "Use square function to make backlight brightness change non linear.",
@@ -90,20 +99,20 @@
             "uniqueId": 4066
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_min_level)\nb=$(expr substr \"${a}\" 30 3); let \"b=b-1\"\n\necho $b",
-            "min": "1",
             "id": "seekbar",
+            "min": "1",
+            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_min_level | cut -c30-33); let \"a=a-1\"\n\necho $a",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+1\"\n\necho $a > \/sys\/class\/backlight\/lm3630\/device\/lm3630_min_level",
             "title": "LCD Backlight Min Level",
-            "max": "30",
             "arguments": "0",
+            "max": "30",
             "description": "The minimum available brightness value.",
             "uniqueId": 935
         },
         {
-            "id": "seekbar",
+            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_max_level | cut -c30-33); let \"a=a-127\"\n\necho $a",
             "min": "127",
-            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_max_level)\nb=$(expr substr \"${a}\" 30 3); let \"b=b-127\"\n\necho $b",
+            "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+127\"\n\necho $a > \/sys\/class\/backlight\/lm3630\/device\/lm3630_max_level",
             "title": "LCD Backlight Max Level",
             "max": "255",
@@ -112,29 +121,30 @@
             "uniqueId": 1011
         },
         {
-            "id": "seekbar",
+            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_level | cut -c26-29); let \"a=a-1\"\n\necho $a",
             "min": "1",
-            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_level)\nb=$(expr substr \"${a}\" 26 3); let \"b=b-1\"\n\necho $b",
+            "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+1\"\n\necho $a > \/sys\/class\/backlight\/lm3630\/device\/lm3630_level",
             "title": "LCD Backlight Actual Brightness",
-            "arguments": "191",
             "max": "255",
+            "arguments": "167",
             "description": "Current screen brightness value.",
             "uniqueId": 8815
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_max_current)\n\necho $a",
-            "min": "0",
             "id": "seekbar",
+            "min": "0",
+            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_max_current)\n\necho $a",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1\n\necho $a > \/sys\/class\/backlight\/lm3630\/device\/lm3630_max_current",
             "title": "LCD Backlight Current",
-            "max": "31",
             "arguments": "24",
+            "max": "31",
             "description": "Maximum backlight current value. Changing this may be dangerous. Increase this value at your own risk.\nStock: 18.",
             "uniqueId": 916
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/proc\/sys\/kernel\/printk)\nb=$(expr substr \"${a}\" 1 1)\necho $b",
+            "progress": "#!\/system\/bin\/sh\n\ncat \/proc\/sys\/kernel\/printk | cut -c1",
             "min": "0",
             "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\nprogress=$1\n\necho $progress > \/proc\/sys\/kernel\/printk",
@@ -146,6 +156,7 @@
         },
         {
             "id": "switch",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\nstatus=$1\n\necho $status > \/sys\/class\/leds\/led:flash_torch\/is_torch",
             "title": "Torch 2-Step Logic",
             "arguments": "1",
@@ -154,46 +165,52 @@
             "uniqueId": 3787
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/class\/leds\/led:flash_torch\/low_brightness) -eq 0 ]; then\n  echo 0\n  exit\nfi\n\na=$(cat \/sys\/class\/leds\/led:flash_torch\/low_brightness); let \"a = (a - 2) \/ 13 + 1)\"\n\necho $a",
-            "min": "1",
             "id": "seekbar",
+            "min": "1",
+            "progress": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/class\/leds\/led:flash_torch\/low_brightness) -eq 0 ]; then\n  echo 0\n  exit\nfi\n\na=$(cat \/sys\/class\/leds\/led:flash_torch\/low_brightness); let \"a = (a - 2) \/ 13 + 1)\"\n\necho $a",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = a * 13 + 1\"\n\necho $a > \/sys\/class\/leds\/led:flash_torch\/low_brightness",
             "title": "LED Default Brightness",
-            "max": "20",
             "arguments": "1",
+            "max": "20",
             "description": "Changes the default brightness of the flashlight. Stock: 8. This value can not be higher than High Brightness mode value.",
             "uniqueId": 5079
         },
         {
-            "id": "seekbar",
-            "min": "1",
             "progress": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/class\/leds\/led:flash_torch\/max_brightness) -eq 0 ]; then\n  echo 0\n  exit\nfi\n\na=$(cat \/sys\/class\/leds\/led:flash_torch\/max_brightness); let \"a = (a - 2) \/ 13 + 1)\"\n\necho $a",
+            "min": "1",
+            "id": "seekbar",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = a * 13 + 1\"\n\necho $a > \/sys\/class\/leds\/led:flash_torch\/max_brightness",
             "title": "LED High Brightness Mode",
-            "max": "20",
             "arguments": "15",
+            "max": "20",
             "description": "Changes the max brightness of the flashlight. Stock: 12. Using torch at high brightness for long time may cause LED overheat.",
             "uniqueId": 4818
         },
         {
-            "id": "switch",
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/max17048_battery\/parameters\/battery_shutdown) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
+            "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\nstatus=$1\n\necho $status > \/sys\/module\/max17048_battery\/parameters\/battery_shutdown",
+            "onboot": true,
             "title": "Battery Shutdown",
             "arguments": "0",
             "description": "Disabling this will remove shutdown trigger if battery level is low. However, kernel will power off device at Battery Min Voltage Threshold to prevent hardware and filesystem damage."
         },
         {
-            "value": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/max17048_battery\/parameters\/uvlo_thr_mv",
             "id": "generic",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\na=$1\n\nif [ $a -lt 2600 ]; then\n  a=2600\nfi\n\nif [ $a -gt 3200 ]; then\n  a=3200\nfi\n\necho $a > \/sys\/module\/max17048_battery\/parameters\/uvlo_thr_mv",
             "title": "Battery Min Voltage Threshold",
+            "arguments": "3100",
             "description": "When battery voltage crosses the preset threshond kernel will force sync fs and power off device. This option can not be disabled.\nValues in mV. [2600-3200].",
+            "value": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/max17048_battery\/parameters\/uvlo_thr_mv",
             "uniqueId": 4935
         },
         {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/force_default_temp",
+            "onboot": true,
             "title": "Disable Battery Temp Control",
             "arguments": "1",
             "description": "Spoofing of battery temperature and disabling state notification. This is useful if your battery temp reads wrong, in example: swapped battery, damaged cable or used 2-wire connection. In this case controller reads -30°C and battery can not be charged because of Cold health state.\nWarning: if this enabled thermal and overvoltage control will be disabled!.\nReplug your charger to apply.",
@@ -203,6 +220,7 @@
         {
             "id": "generic",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = (a \/ 16 + ((a % 16) > 0)) * 16\"\n\nif [ $a -lt 3504 ]; then\n  echo 3504 > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv\n  exit\nfi\n\nif [ $a -gt 4400 ]; then\n  echo 4400 > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv\n  exit\nfi\n\necho $a > \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv",
+            "onboot": true,
             "title": "Battery Max Designed Voltage",
             "arguments": "4300",
             "description": "This value should depend on max designed voltage of installed battery. Bad value may cause degradation, fire and explosion of the battery. So set voltage properly.\nReplug you charger after changing this.\n[Li-ion: 4200mV. Li-poly: 4350-4400mV].\n[Nexus 5 BL-T9: 4350mV].",
@@ -212,6 +230,7 @@
         {
             "id": "generic",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/fcc_mah",
+            "onboot": true,
             "title": "Battery Designed Capacity",
             "arguments": "2750",
             "description": "Set full charge battery capacity mah. Changing this value will not affect on real capacity.",
@@ -221,6 +240,7 @@
         {
             "id": "generic",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/batt_soc_coeff",
+            "onboot": true,
             "title": "Battery Precentage Coefficient",
             "arguments": "31100",
             "description": "Fine tune for battery capacity level displayed by the system. Adjust this value at full charge. Wait to update current battery level.\nStock: 19531.",
@@ -229,6 +249,7 @@
         },
         {
             "id": "switch",
+            "onboot": true,
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/low_batt_disable_dyn_fsync",
             "title": "Disable Dynamic Fsync If Low Battery",
             "arguments": "1",
@@ -237,18 +258,19 @@
             "uniqueId": 3362
         },
         {
-            "id": "seekbar",
-            "min": "0",
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/module\/max17048_battery\/parameters\/suspend_timed_alerts_ms); let \"a = a \/ 1000\"\n\necho $a",
+            "min": "0",
+            "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = a * 1000\"\n\necho $a > \/sys\/module\/max17048_battery\/parameters\/suspend_timed_alerts_ms",
             "title": "Restrict MAX17048 Interrupts",
-            "arguments": "0",
             "max": "90",
+            "arguments": "0",
             "description": "Select the minimum possible period of battery controller driver work cycle while device is in suspended state. Kernel updates battery data after battery controller send an interrupt. Enabling this may slightly reduce number of MAX17048 wakelocks but not recomended.\nValue in seconds.\nSet 0 to disable.",
             "uniqueId": 4365
         },
         {
             "id": "generic",
+            "onboot": false,
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/sync_threshold_min",
             "title": "CPU Boost: Min Sync Threshold",
             "arguments": "0",
@@ -259,6 +281,7 @@
         {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/load_based_syncs",
+            "onboot": true,
             "title": "CPU Boost: Load Based Syncs",
             "arguments": "1",
             "description": "Determine whether the module should react to all task migration events or only to those which maintain task load at least that specified by \"Migration Load Threshold\".\nThis switch also changes the way CPU frequencies are going to be changed: when it is disabled, frequencies of source and destination cpus are simply synchronized to a source's one; in case this is enabled, the frequency is changed to either the load fraction of current policy maximum or source's frequency, choosing the biggest of two.",
@@ -266,19 +289,21 @@
             "uniqueId": 7888
         },
         {
-            "id": "seekbar",
-            "min": "0",
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/cpu_boost\/parameters\/migration_load_threshold",
+            "min": "0",
+            "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/migration_load_threshold",
+            "onboot": true,
             "title": "CPU Boost: Migration Load Threshold",
-            "arguments": "20",
             "max": "100",
+            "arguments": "20",
             "description": "Minimum task load (in precentage) that is considered as noticeable. If a task load is less than this value, frequency synchronization will not occur.\nNote that this threshold is used only if \"Load Based Syncs\" is enabled.",
             "uniqueId": 5057
         },
         {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/disable_while_suspended",
+            "onboot": true,
             "title": "CPU Boost: Disable Boost When Suspended",
             "arguments": "1",
             "description": "Use state notifier helper to determine state and disable cpu-boost driver when device is suspended. This should help to minimize unnecessary spikes and reduce power consumption when screen is off.",
@@ -286,57 +311,60 @@
             "uniqueId": 1325
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/kgsl\/kgsl-3d0\/wake_nice); let \"a = -a\"\necho $a",
-            "min": "0",
             "id": "seekbar",
+            "min": "0",
+            "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/kgsl\/kgsl-3d0\/wake_nice); let \"a = -a\"\necho $a",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = -a\"\necho $a > \/sys\/class\/kgsl\/kgsl-3d0\/wake_nice",
             "title": "KGSL: Queue Priority",
-            "arguments": "7",
             "max": "20",
+            "arguments": "7",
             "description": "The GPU start sequence needs to run with low latency when coming out of slumber for the first draw command. This control changes priority of the start function workqueue.\nGreater value = higher priority.\nNot recomended to touch this.",
             "uniqueId": 368
         },
         {
-            "id": "seekbar",
-            "min": "0",
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/warmup_ms",
+            "min": "0",
+            "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/warmup_ms\necho 5 > \/sys\/class\/timed_output\/vibrator\/enable",
+            "onboot": true,
             "title": "Vibrator Warmup Time",
-            "arguments": "22",
             "max": "60",
+            "arguments": "22",
             "description": "PWM vibrator timing fine tune. Value in ms.",
             "uniqueId": 3194
         },
         {
-            "id": "seekbar",
-            "min": "0",
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/driving_ms",
+            "min": "0",
+            "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/driving_ms\necho 5 > \/sys\/class\/timed_output\/vibrator\/enable",
+            "onboot": true,
             "title": "Vibrator Driving Time",
-            "arguments": "19",
             "max": "60",
+            "arguments": "19",
             "description": "PWM vibrator timing fine tune. Value in ms.",
             "uniqueId": 6324
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/braking_ms",
-            "min": "0",
             "id": "seekbar",
+            "min": "0",
+            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/braking_ms",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/braking_ms\necho 5 > \/sys\/class\/timed_output\/vibrator\/enable",
+            "onboot": true,
             "title": "Vibrator Braking Time",
-            "arguments": "30",
             "max": "60",
+            "arguments": "30",
             "description": "PWM vibrator timing fine tune. Value in ms.",
             "uniqueId": 2417
         },
         {
-            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/enable",
-            "min": "0",
             "id": "seekbar",
+            "min": "0",
+            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/enable",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/enable",
             "title": "Vibration Test Pulse",
-            "max": "40",
             "arguments": "0",
+            "max": "60",
             "description": "Select value to test your fine tune PWM vibrator settings. Value in ms.",
             "uniqueId": 9312
         }
