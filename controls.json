@@ -103,6 +103,7 @@
             "min": "1",
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_min_level | cut -c30-33); let \"a=a-1\"\n\necho $a",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+1\"\n\necho $a > \/sys\/class\/backlight\/lm3630\/device\/lm3630_min_level",
+            "onboot": true,
             "title": "LCD Backlight Min Level",
             "arguments": "0",
             "max": "30",
@@ -114,6 +115,7 @@
             "min": "127",
             "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+127\"\n\necho $a > \/sys\/class\/backlight\/lm3630\/device\/lm3630_max_level",
+            "onboot": true,
             "title": "LCD Backlight Max Level",
             "max": "255",
             "arguments": "128",
@@ -142,17 +144,6 @@
             "max": "31",
             "description": "Maximum backlight current value. Changing this may be dangerous. Increase this value at your own risk.\nStock: 18.",
             "uniqueId": 916
-        },
-        {
-            "progress": "#!\/system\/bin\/sh\n\ncat \/proc\/sys\/kernel\/printk | cut -c1",
-            "min": "0",
-            "id": "seekbar",
-            "apply": "#!\/system\/bin\/sh\n\nprogress=$1\n\necho $progress > \/proc\/sys\/kernel\/printk",
-            "title": "Kernel Log Level",
-            "max": "8",
-            "arguments": "7",
-            "description": "Change the default console log level.",
-            "uniqueId": 1133
         },
         {
             "id": "switch",
@@ -367,6 +358,27 @@
             "max": "60",
             "description": "Select value to test your fine tune PWM vibrator settings. Value in ms.",
             "uniqueId": 9312
+        },
+        {
+            "progress": "#!\/system\/bin\/sh\n\ncat \/proc\/sys\/kernel\/printk | cut -c1",
+            "min": "0",
+            "id": "seekbar",
+            "apply": "#!\/system\/bin\/sh\n\nprogress=$1\n\necho $progress > \/proc\/sys\/kernel\/printk",
+            "onboot": true,
+            "title": "Kernel Log Level",
+            "max": "8",
+            "arguments": "7",
+            "description": "Change the default console log level.",
+            "uniqueId": 1133
+        },
+        {
+            "enable": "#!\/system\/bin\/sh\n\ncat \/sys\/kernel\/rcu_expedited",
+            "id": "switch",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/kernel\/rcu_expedited",
+            "title": "Force Use Of Expedited RCU Primitives",
+            "arguments": "0",
+            "description": "There have been some embedded applications that would benefit from use of expedited grace-period primitives.",
+            "uniqueId": 4287
         }
     ],
     "version": 1
