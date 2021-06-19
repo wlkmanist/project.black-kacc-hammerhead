@@ -1,13 +1,15 @@
 {
+    "version": 1,
     "database": [
         {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\nsetenforce $1",
             "title": "SELinux",
-            "arguments": "1",
+            "arguments": "0",
             "description": "Security-Enhanced Linux is a Linux kernel security module that provides a mechanism for supporting access control security policies.",
             "enable": "#\/system\/bin\/sh\nif [ `getenforce` == \"Enforcing\" ]; then\necho 1\nelse\necho 0\nfi",
-            "uniqueId": 7646
+            "uniqueId": 7646,
+            "onboot": true
         },
         {
             "id": "seekbar",
@@ -18,16 +20,18 @@
             "max": "2",
             "arguments": "2",
             "description": "Disabled\nForce AC\nCustom mA",
-            "uniqueId": 6964
+            "uniqueId": 6964,
+            "onboot": true
         },
         {
             "id": "generic",
             "apply": "#!\/system\/bin\/sh\n\nvalue=$1\n\necho $value > \/sys\/kernel\/fast_charge\/fast_charge_level",
             "title": "Fast Charge custom current limit",
-            "arguments": "1200",
+            "arguments": "1500",
             "description": "Limit max charge current mA\nWorks if Force Fast Charge in custom mode\n[500 900 1200 1500 1800 2000]",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/kernel\/fast_charge\/fast_charge_level",
-            "uniqueId": 285
+            "uniqueId": 285,
+            "onboot": true
         },
         {
             "id": "switch",
@@ -36,7 +40,8 @@
             "arguments": "1",
             "description": "SoC temperature limit toggle.",
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/msm_thermal\/parameters\/enable_main) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
-            "uniqueId": 7827
+            "uniqueId": 7827,
+            "onboot": true
         },
         {
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/module\/msm_thermal\/parameters\/temp_threshold); let \"a=a-20\"\n\necho $a",
@@ -44,10 +49,11 @@
             "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+20\"\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/temp_threshold",
             "title": "Temperature Limit",
-            "arguments": "67",
+            "arguments": "60",
             "max": "110",
             "description": "If the temperature goes above, the thermal will throttle the CPU frequency to lower the temperature.",
-            "uniqueId": 2354
+            "uniqueId": 2354,
+            "onboot": true
         },
         {
             "id": "switch",
@@ -56,7 +62,8 @@
             "arguments": "1",
             "description": "Critical shutdown by SoC temperature threshold.\nDisable this only if you using extreme cooling and CPU temp is below zero.",
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/msm_thermal\/parameters\/enable_extreme) = Y ]\nthen\n  echo 0\nelse \n  echo 1\nfi",
-            "uniqueId": 4524
+            "uniqueId": 4524,
+            "onboot": true
         },
         {
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit); let \"a=a-95\"\n\necho $a",
@@ -64,27 +71,47 @@
             "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+95\"\n\nchmod \"644\" \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit\n\nchmod \"444\" \/sys\/module\/msm_thermal\/parameters\/temp_threshold_crit",
             "title": "Critical Temperature Threshold",
-            "arguments": "10",
+            "arguments": "15",
             "max": "125",
             "description": "If the temperature goes above, the thermal will synchronize filesystem and power off. This threshold needs to avoid permanent hardware damage if throttling disabled or it works ineffective by any case.",
-            "uniqueId": 3075
+            "uniqueId": 3075,
+            "onboot": true
         },
         {
             "id": "seekbar",
-            "min": "0",
-            "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/msm_thermal\/parameters\/polling_freq_preset",
-            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/msm_thermal\/parameters\/polling_freq_preset",
-            "title": "Thermal Driver Polling Frequency",
-            "arguments": "6",
-            "max": "7",
-            "description": "High values provides more stable thermals while throttling. Low values have lower CPU impact. This value is used only if current SOC temperature up to 15°C below throttling threshold temp. On low temp used: 4Hz.\n[Def   4   5   8   10   20   25   40]\nValues in Hz.\nSelect 0 to choose default polling frequency.",
-            "uniqueId": 1204
+            "min": "1",
+            "progress": "#!\/system\/bin\/sh\n\n\na=$(cat \/sys\/module\/msm_thermal\/parameters\/slow_poll_freq_preset); let \"a=a-1\"\n\necho $a",
+            "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+1\"\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/slow_poll_freq_preset",
+            "title": "Thermal Driver Slow Poll Frequency",
+            "max": "9",
+            "description": "Sometimes we have cpu load spikes that results temperature spikes. On an overclocked device with terrible cooling that spikes can not be controled by msm_thermal with default polling interval. Increase this value if you have that problem.\n[4  5  8  10  20  25  40  50  100]\nValues in Hz.\nSelect 0 to choose default polling frequency."
+        },
+        {
+            "id": "seekbar",
+            "min": "1",
+            "progress": "#!\/system\/bin\/sh\n\n\na=$(cat \/sys\/module\/msm_thermal\/parameters\/fast_poll_freq_preset); let \"a=a-1\"\n\necho $a",
+            "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+1\"\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/fast_poll_freq_preset",
+            "title": "Thermal Driver Fast Poll Frequency",
+            "arguments": "7",
+            "max": "9",
+            "description": "Same there but this value is used only if current SOC temperature above fast poll threshold that depends by offset and throttling threshold temp. High values provides more stable thermals while throttling. Low values have lower CPU impact.\n[4  5  8  10  20  25  40  50  100]\nValues in Hz.\nSelect 0 to choose default polling frequency.",
+            "uniqueId": 1204,
+            "onboot": true
+        },
+        {
+            "progress": "#!\/system\/bin\/sh\n\n\na=$(cat \/sys\/module\/msm_thermal\/parameters\/fast_poll_temp_offset); let \"a=-a+40\"\n\necho $a",
+            "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=-a+40\"\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/fast_poll_temp_offset",
+            "min": "-40",
+            "id": "seekbar",
+            "title": "Thermal Driver Fast Poll Temp Offset",
+            "max": "-15",
+            "description": "Temperature offset from throttling threshold temp that changing the fast poll threshold. Move slider to left if SOC temperature rising over the throttling threshold when CPU load running from idle to high load."
         },
         {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/backlight\/lm3630\/device\/lm3630_exp_control",
             "title": "Exponential LCD Backlight Level Control",
-            "arguments": "1",
+            "arguments": "0",
             "description": "Use square function to make backlight brightness change non linear.",
             "enable": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/backlight\/lm3630\/device\/lm3630_exp_control\n",
             "uniqueId": 4066
@@ -98,7 +125,8 @@
             "arguments": "0",
             "max": "30",
             "description": "The minimum available brightness value.",
-            "uniqueId": 935
+            "uniqueId": 935,
+            "onboot": true
         },
         {
             "progress": "#!\/system\/bin\/sh\n\na=$(cat \/sys\/class\/backlight\/lm3630\/device\/lm3630_max_level | cut -c30-33); let \"a=a-127\"\n\necho $a",
@@ -131,13 +159,14 @@
             "arguments": "24",
             "max": "31",
             "description": "Maximum backlight current value. Changing this may be dangerous. Increase this value at your own risk.\nStock: 18.",
-            "uniqueId": 916
+            "uniqueId": 916,
+            "onboot": true
         },
         {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\nstatus=$1\n\necho $status > \/sys\/class\/leds\/led:flash_torch\/is_torch",
             "title": "Torch 2-Step Logic",
-            "arguments": "1",
+            "arguments": "0",
             "description": "Apply custom 2-step logic for torch LED. That allows 2 levels of brightness to be changed on kernel level. Compatible with CM torch apps (that have High Brightness mode).",
             "enable": "#!\/system\/bin\/sh\n\necho $(cat \/sys\/class\/leds\/led:flash_torch\/is_torch)",
             "uniqueId": 3787
@@ -148,10 +177,11 @@
             "progress": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/class\/leds\/led:flash_torch\/low_brightness) -eq 0 ]; then\n  echo 0\n  exit\nfi\n\na=$(cat \/sys\/class\/leds\/led:flash_torch\/low_brightness); let \"a = (a - 2) \/ 13 + 1)\"\n\necho $a",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = a * 13 + 1\"\n\necho $a > \/sys\/class\/leds\/led:flash_torch\/low_brightness",
             "title": "LED Default Brightness",
-            "arguments": "1",
+            "arguments": "2",
             "max": "20",
             "description": "Changes the default brightness of the flashlight. Stock: 8. This value can not be higher than High Brightness mode value.",
-            "uniqueId": 5079
+            "uniqueId": 5079,
+            "onboot": true
         },
         {
             "progress": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/class\/leds\/led:flash_torch\/max_brightness) -eq 0 ]; then\n  echo 0\n  exit\nfi\n\na=$(cat \/sys\/class\/leds\/led:flash_torch\/max_brightness); let \"a = (a - 2) \/ 13 + 1)\"\n\necho $a",
@@ -159,10 +189,11 @@
             "id": "seekbar",
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a = a * 13 + 1\"\n\necho $a > \/sys\/class\/leds\/led:flash_torch\/max_brightness",
             "title": "LED High Brightness Mode",
-            "arguments": "15",
+            "arguments": "2",
             "max": "20",
             "description": "Changes the max brightness of the flashlight. Stock: 12. Using torch at high brightness for long time may cause LED overheat.",
-            "uniqueId": 4818
+            "uniqueId": 4818,
+            "onboot": true
         },
         {
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/max17048_battery\/parameters\/battery_shutdown) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
@@ -170,7 +201,8 @@
             "apply": "#!\/system\/bin\/sh\n\nstatus=$1\n\necho $status > \/sys\/module\/max17048_battery\/parameters\/battery_shutdown",
             "title": "Battery Shutdown",
             "arguments": "0",
-            "description": "Disabling this will remove shutdown trigger if battery level is low. However, kernel will power off device at Battery Min Voltage Threshold to prevent hardware and filesystem damage."
+            "description": "Disabling this will remove shutdown trigger if battery level is low. However, kernel will power off device at Battery Min Voltage Threshold to prevent hardware and filesystem damage.",
+            "onboot": true
         },
         {
             "id": "generic",
@@ -179,16 +211,18 @@
             "arguments": "3100",
             "description": "When battery voltage crosses the preset threshond kernel will force sync fs and power off device. This option can not be disabled.\nValues in mV. [2600-3200].",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/max17048_battery\/parameters\/uvlo_thr_mv",
-            "uniqueId": 4935
+            "uniqueId": 4935,
+            "onboot": true
         },
         {
             "id": "switch",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/max17048_battery\/parameters\/force_default_temp",
             "title": "Disable Battery Temp Control",
-            "arguments": "1",
+            "arguments": "0",
             "description": "Spoofing of battery temperature and disabling state notification. This is useful if your battery temp reads wrong, in example: swapped battery, damaged cable or used 2-wire connection. In this case controller reads -30°C and battery can not be charged because of Cold health state.\nWarning: if this enabled thermal and overvoltage control will be disabled!.\nReplug your charger to apply.",
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/max17048_battery\/parameters\/force_default_temp) = N ]\nthen\n  echo 0\nelse \n  echo 1\nfi",
-            "uniqueId": 2202
+            "uniqueId": 2202,
+            "onboot": true
         },
         {
             "id": "generic",
@@ -197,13 +231,14 @@
             "arguments": "4300",
             "description": "This value should depend on max designed voltage of installed battery. Bad value may cause degradation, fire and explosion of the battery. So set voltage properly.\nReplug you charger after changing this.\n[Li-ion: 4200mV. Li-poly: 4350-4400mV].\n[Nexus 5 BL-T9: 4350mV].",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/max_voltage_mv",
-            "uniqueId": 9777
+            "uniqueId": 9777,
+            "onboot": true
         },
         {
             "id": "generic",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/misc\/max17048_tweaks\/fcc_mah",
             "title": "Battery Designed Capacity",
-            "arguments": "2750",
+            "arguments": "1700",
             "description": "Set full charge battery capacity mah. Changing this value will not affect on real capacity.",
             "value": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/misc\/max17048_tweaks\/fcc_mah",
             "uniqueId": 9149
@@ -253,7 +288,8 @@
             "arguments": "1",
             "description": "Determine whether the module should react to all task migration events or only to those which maintain task load at least that specified by \"Migration Load Threshold\".\nThis switch also changes the way CPU frequencies are going to be changed: when it is disabled, frequencies of source and destination cpus are simply synchronized to a source's one; in case this is enabled, the frequency is changed to either the load fraction of current policy maximum or source's frequency, choosing the biggest of two.",
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/cpu_boost\/parameters\/load_based_syncs ) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
-            "uniqueId": 7888
+            "uniqueId": 7888,
+            "onboot": true
         },
         {
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/module\/cpu_boost\/parameters\/migration_load_threshold",
@@ -262,9 +298,10 @@
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/module\/cpu_boost\/parameters\/migration_load_threshold",
             "title": "CPU Boost: Migration Load Threshold",
             "max": "100",
-            "arguments": "20",
+            "arguments": "25",
             "description": "Minimum task load (in precentage) that is considered as noticeable. If a task load is less than this value, frequency synchronization will not occur.\nNote that this threshold is used only if \"Load Based Syncs\" is enabled.",
-            "uniqueId": 5057
+            "uniqueId": 5057,
+            "onboot": true
         },
         {
             "id": "switch",
@@ -273,7 +310,8 @@
             "arguments": "1",
             "description": "Use state notifier helper to determine state and disable cpu-boost driver when device is suspended. This should help to minimize unnecessary spikes and reduce power consumption when screen is off.",
             "enable": "#!\/system\/bin\/sh\n\nif [ $(cat \/sys\/module\/cpu_boost\/parameters\/disable_while_suspended ) = Y ]\nthen\n  echo 1\nelse \n  echo 0\nfi",
-            "uniqueId": 1325
+            "uniqueId": 1325,
+            "onboot": true
         },
         {
             "id": "seekbar",
@@ -295,7 +333,8 @@
             "max": "60",
             "arguments": "22",
             "description": "PWM vibrator timing fine tune. Value in ms.",
-            "uniqueId": 3194
+            "uniqueId": 3194,
+            "onboot": true
         },
         {
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/driving_ms",
@@ -306,7 +345,8 @@
             "max": "60",
             "arguments": "19",
             "description": "PWM vibrator timing fine tune. Value in ms.",
-            "uniqueId": 6324
+            "uniqueId": 6324,
+            "onboot": true
         },
         {
             "id": "seekbar",
@@ -317,7 +357,8 @@
             "max": "60",
             "arguments": "30",
             "description": "PWM vibrator timing fine tune. Value in ms.",
-            "uniqueId": 2417
+            "uniqueId": 2417,
+            "onboot": true
         },
         {
             "id": "seekbar",
@@ -350,6 +391,5 @@
             "description": "There have been some embedded applications that would benefit from use of expedited grace-period primitives.",
             "uniqueId": 4287
         }
-    ],
-    "version": 1
+    ]
 }
