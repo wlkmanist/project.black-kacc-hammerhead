@@ -84,7 +84,9 @@
             "apply": "#!\/system\/bin\/sh\n\na=$1; let \"a=a+1\"\n\necho $a > \/sys\/module\/msm_thermal\/parameters\/slow_poll_freq_preset",
             "title": "Thermal Driver Slow Poll Frequency",
             "max": "9",
-            "description": "Sometimes we have cpu load spikes that results temperature spikes. On an overclocked device with terrible cooling that spikes can not be controled by msm_thermal with default polling interval. Increase this value if you have that problem.\n[4  5  8  10  20  25  40  50  100]\nValues in Hz.\nSelect 0 to choose default polling frequency."
+            "description": "Sometimes we have cpu load spikes that results temperature spikes. On an overclocked device with terrible cooling that spikes can not be controled by msm_thermal with default polling interval. Increase this value if you have that problem.\n[4  5  8  10  20  25  40  50  100]\nValues in Hz.\nSelect 0 to choose default polling frequency.",
+            "onboot": true,
+            "arguments": "3"
         },
         {
             "id": "seekbar",
@@ -105,7 +107,9 @@
             "id": "seekbar",
             "title": "Thermal Driver Fast Poll Temp Offset",
             "max": "-15",
-            "description": "Temperature offset from throttling threshold temp that changing the fast poll threshold. Move slider to left if SOC temperature rising over the throttling threshold when CPU load running from idle to high load."
+            "description": "Temperature offset from throttling threshold temp that changing the fast poll threshold. Move slider to left if SOC temperature rising over the throttling threshold when CPU load running from idle to high load.",
+            "onboot": true,
+            "arguments": "20"
         },
         {
             "id": "switch",
@@ -366,10 +370,26 @@
             "progress": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/enable",
             "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/enable",
             "title": "Vibration Test Pulse",
-            "arguments": "0",
+            "arguments": "60",
             "max": "60",
             "description": "Select value to test your fine tune PWM vibrator settings. Value in ms.",
             "uniqueId": 9312
+        },
+        {
+            "enable": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/invert_polarity",
+            "id": "switch",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/invert_polarity",
+            "title": "Vibrator Polarity Reverse",
+            "description": "Change the vibration motor polarity. Enable this if motor connected with reversed polarity.",
+            "arguments": "0"
+        },
+        {
+            "value": "#!\/system\/bin\/sh\n\ncat \/sys\/class\/timed_output\/vibrator\/voltage_mv",
+            "id": "generic",
+            "apply": "#!\/system\/bin\/sh\n\necho $1 > \/sys\/class\/timed_output\/vibrator\/voltage_mv",
+            "title": "Vibration Motor Voltage",
+            "description": "Change this if device running with swapped vibration motor. Value in mV.",
+            "arguments": "3600"
         },
         {
             "progress": "#!\/system\/bin\/sh\n\ncat \/proc\/sys\/kernel\/printk | cut -c1",
